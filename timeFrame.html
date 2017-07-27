@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Set Message Display Time</title>
+<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+<script>
+    try {
+        $ = jQuery = module.exports;
+        // If you want module.exports to be empty, uncomment:
+        // module.exports = {};
+    } catch(e) {}
+    
+</script>
+</head>
+<body style="margin: 0px; height: 100vh;">
+<div align = "center" style = "display: flex; align-items:center;">
+<input type = "number" id = "display_time"></input>
+<button class = "okbtn">OK</button>
+</div>
+
+<script type="text/javascript">
+  
+  if (typeof(require) !== 'undefined') {
+    var ipc = require('electron').ipcRenderer;
+//    if loaded ... 
+      $(document).ready(function() {
+      if (typeof ipc !== "undefined") {
+        
+        $('.okbtn').click(function(){
+          ipc.send("setDiplayMessageTime", $('#display_time').val());   
+          window.close();       
+        });
+      }
+    })
+  }
+  
+  //******************* ScaleDrone Integration ////
+</script>
+</body>
+</html>

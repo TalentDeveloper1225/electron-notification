@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dental Intel</title>
+	<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+<script>
+    try {
+        $ = jQuery = module.exports;
+        // If you want module.exports to be empty, uncomment:
+        // module.exports = {};
+    } catch(e) {}
+</script>
+
+
+<script type="text/javascript" src="https://cdn.scaledrone.com/scaledrone.min.js"></script>	
+
+	<script type="text/javascript">if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+</head>
+<body>
+<div id = "Notification-container" style = "position:absolute; left:30%; right:30%; top:0;" align = "center">
+	
+</div>
+<h1>test page</h1>
+<button class = "message_button">Message</button>
+<button class = "update_button">update</button>
+<script type="text/javascript">
+	//******************* First hack for ScaleDrone Integration ////
+	
+	var current_practice_id = "11CBDDE5-FF1D-467A-AE28-3784A8D45262";
+
+	if (typeof(require) !== 'undefined') {
+		var ipc = require('electron').ipcRenderer;
+// 		if loaded ... 
+  		$(document).ready(function() {
+			if (typeof ipc !== "undefined") {
+				var t = 0;
+				$('.message_button').click(function(){
+					var message_data = {
+						title: "Test Message"+ t.toString(),
+						message: "This is a test message."
+					};
+					
+					ipc.send("send-message", message_data);
+					t++;
+				});
+
+				$('.update_button').click(function(){
+					
+					ipc.send("start-autoUpdate");
+					t++;
+				});
+
+// 				catching the callback
+				ipc.on('callback_id', function(event, data) {
+					if( data !== "undefined" && data !== null)
+					{
+						console.log(data);
+						if( typeof patientCardFunction !== "undefined" ){
+							patientCardFunction(data);
+						}
+					}
+
+				});
+			}
+
+			var desktop_drone = new ScaleDrone('IDI0BGaZwkE4Dhtn');
+			desktop_drone.on('open', function(error) {
+// 				Connected if no error
+				console.log("desktop_drone open")
+				var room = desktop_drone.subscribe(current_practice_id)
+				room.on('open', function(error) {
+					console.log("desktop_drone notifications room open")
+					if (error) return console.error(error);
+// 						Connected to room
+				});
+				room.on('data', function(data) {
+					//******************* Sending data into main via IPC ////
+					if (typeof ipc !== 'undefined') {
+						ipc.send('scaledrone_direct_data_stream', data); // all the data
+					}
+					//******************* End of Sending data into main via IPC ////
+				});
+			});
+		});
+	}
+	
+	//******************* ScaleDrone Integration ////
+</script>	
+
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Call Notification</title>
+<style>
+
+  #main_box .focus-message{
+    width:65%;
+  }
+
+  #main_box .focus-message:nth-child(1){
+    width:100%;
+  }
+
+  #main_box .focus-message:nth-child(2){
+    width:80%;
+  }
+
+  #main_box .focus-message:nth-child(3){
+    width:70%;
+  }
+
+</style>
+<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+<script>
+    try {
+        $ = jQuery = module.exports;
+        // If you want module.exports to be empty, uncomment:
+        // module.exports = {};
+    } catch(e) {}
+    function removeMessage(element){
+      element.remove();      
+      autoSetPosSize();
+      if($("#main_box .focus-message").length == 0){        
+        window.close();
+      }
+    }
+
+    function ShowDetailMessage(element){
+      var ipc = require('electron').ipcRenderer;      
+      ipc.send('toaster-reply', $(element).parent().parent().parent().parent(), 0);
+    }
+
+    function autoSetPosSize(){
+      if($("#main_box .focus-message").length <= 4 && $("#main_box .focus-message").length>0){
+        var heightOffset = window.outerHeight - window.innerHeight;
+      
+        var result = {
+          height : document.getElementById("content").clientHeight + heightOffset,
+          width : window.outerWidth
+        }
+      
+        window.resizeTo(result.width, result.height);
+        window.moveTo(screen.width-result.width, screen.height-result.height);     
+      }
+    };
+</script>
+</head>
+<body style = "margin: 0px">
+<div  id="content" > <!--style = "height:calc(100vh - 30px);overflow: auto;">-->
+  <div id = "main_box" align = "center"><!-- style = " height: 100%;">-->
+    
+  </div>
+</div>
+
+</body>
+</html>

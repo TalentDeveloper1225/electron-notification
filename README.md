@@ -1,2 +1,32 @@
-# electron-notification
-This is my first chatting project using electron framework.
+# didesktop
+
+> My luminous app
+
+
+## Dev
+
+```
+$ npm install
+```
+
+### Run
+
+```
+$ npm start
+```
+
+### Build
+
+```
+$ npm run build
+```
+
+Builds the app for macOS, Linux, and Windows, using [electron-packager](https://github.com/electron-userland/electron-packager).
+
+
+## License
+
+MIT © [matt.porter](http://dentalintel.com)
+
+
+npm run publish
