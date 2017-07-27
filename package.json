@@ -1,0 +1,54 @@
+{
+  "name": "didesktop",
+  "productName": "Didesktop",
+  "version": "0.1.8",
+  "description": "Dental Intel Desktop",
+  "license": "MIT",
+  "repository": "mporter-di/didesktop",
+  "author": {
+    "name": "Matt Porter",
+    "email": "mporter@dentalintel.com",
+    "url": "dentalintel.com"
+  },
+  "scripts": {
+    "test": "xo",
+    "start": "electron . --diable-gpu",
+    "build": "electron-packager . --out=dist --asar --overwrite --all",
+    "pack": "build --dir",
+    "dist": "build",
+    "publish": "build -p always",
+    "postinstall": "install-app-deps"
+  },
+  "files": [
+    "index.js",
+    "index.html",
+    "index.css"
+  ],
+  "keywords": [
+    "electron-app",
+    "electron"
+  ],
+  "dependencies": {
+    "auto-updater": "^1.0.2",
+    "electron-debug": "^1.0.0",
+    "electron-log": "^2.2.6",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^2.2.1"
+  },
+  "devDependencies": {
+    "devtron": "^1.1.0",
+    "electron": "^1.3.3",
+    "electron-builder": "^18.6.2",
+    "electron-packager": "^8.0.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "auto-updater": "^1.0.2",
+    "xo": "^0.16.0"
+  },
+  "xo": {
+    "esnext": true,
+    "envs": [
+      "node",
+      "browser"
+    ]
+  }
+}
