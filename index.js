@@ -1,5 +1,7 @@
 const electron = require('electron');
 const Toaster = require('./toaster.js');
+const path = require('path');
+const Store = require('./store.js');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
@@ -11,7 +13,7 @@ const autoUpdater = require("electron-updater").autoUpdater;
 var trayImage;
 var imageFolder = __dirname + '/assets/images';
 var tray = null;
-var displayMessageTime = 30000;
+
 // Determine appropriate icon for platform
 if (process.platform == 'darwin') {
     trayImage = imageFolder + '/di-logo-32x32.png';
@@ -19,21 +21,38 @@ if (process.platform == 'darwin') {
     trayImage = imageFolder + '/favicon.ico';
 }
 
-// // Report crashes to our server.
-// electron.crashReporter.start();
-
 var mainWindow = null;
 var toasterObj = null;
 
+/*********************************/
+//Initialize App Setting Info.
+/*********************************/
+const store = new Store({
+  // We'll call our data file 'user-preferences'
+  configName: 'Setting_information',
+  defaults: {
+    // 800x600 is the default size of our window
+    messageNotificationTime: 5000
+  }
+});
+
+var messageNotificationTime = 120000;
+/*********************************/
 //Quit all windows are closed.
+/*********************************/
 app.on('window-all-closed', function(){
 	if(process.platform != 'darwin'){
 		app.quit();
 	}
 });
 
+/*********************************/
 //initialization and is ready to create browser windows.
+/*********************************/
 app.on('ready', function () {
+    
+    //Get the setting information
+    messageNotificationTime = store.get('messageNotificationTime');
 
     // Create the browser mainWindow.
     mainWindow = new BrowserWindow({
@@ -48,58 +67,37 @@ app.on('ready', function () {
 
     const template = [
         {
-            label: 'Edit',
-            submenu: [
-              {role: 'undo'},
-              {role: 'redo'},
-              {type: 'separator'},
-              {role: 'cut'},
-              {role: 'copy'},
-              {role: 'paste'},
-              {role: 'pasteandmatchstyle'},
-              {role: 'delete'},
-              {role: 'selectall'}
-            ]
-        },
-        {
-            label: 'View',
+            label: 'Settings',
             submenu: [
               {role: 'reload'},
-              {role: 'forcereload'},
-              {role: 'toggledevtools'},
-              {type: 'separator'},
-              {role: 'resetzoom'},
-              {role: 'zoomin'},
-              {role: 'zoomout'},
-              {type: 'separator'},
-              {role: 'togglefullscreen'}
-            ]
-        },
-        {
-            role: 'window',
-            submenu: [
-              {role: 'minimize'},
-              {role: 'close'}
+              {
+                label: 'Back',
+                click () { if( mainWindow.webContents.canGoBack() ){mainWindow.webContents.goBack();} }
+              }
             ]
         },
         {
             role: 'help',
             submenu: [
               {
-                label: 'Learn More',
-                click () { require('electron').shell.openExternal('https://electron.atom.io') }
+                label: 'Dental Intel Community',
+                click () { require('electron').shell.openExternal('https://community.dentalintel.com') }
               }
             ]
         }
     ]
     template[0].submenu.push({
-        label: 'Time Frame',
+        label: 'Screen Pop',
         click: (menuItem, browserWindow, event) => {
             var timeframe = new BrowserWindow({
+                parent: mainWindow,
                 width:500,
                 height:200,
                 icon: trayImage,
+                frame: false,
+                "always-on-top": true
             });
+            timeframe.setResizable(true);
             timeframe.setMenu(null);
             timeframe.loadURL('file://' + __dirname + '/timeframe.html');
             timeframe.webContents.openDevTools();
@@ -108,8 +106,12 @@ app.on('ready', function () {
     })
 
     const contextMenu = electron.Menu.buildFromTemplate(template);    
-    //tray.setToolTip('DentalIntel Portal');
+    tray.setToolTip('DentalIntel Portal');
     tray.setContextMenu(contextMenu);
+    tray.on('click', () => {
+      mainWindow.isVisible() ? (mainWindow.isMaximized()? mainWindow.minimize() : mainWindow.maximize()): mainWindow.show();
+    })
+
     electron.Menu.setApplicationMenu(contextMenu);
 
     //load the index.html of the app
@@ -117,14 +119,15 @@ app.on('ready', function () {
 
     //open the devTools
     mainWindow.webContents.openDevTools();
-    
+
     //Emitted when the window is closed
     mainWindow.on('closed', function(){        
     	mainWindow = null;
     });   
 
     //Create Toaster
-    toasterObj = new Toaster();    
+    toasterObj = new Toaster();
+    toasterObj.initializeToaster(mainWindow);
 });
 
 
@@ -133,29 +136,34 @@ app.on('ready', function () {
 /*******************************/
 
 ipc.on('setDiplayMessageTime', (event, data)=>{
-  displayMessageTime = data * 1000;
+  messageNotificationTime = data * 1000;  
+  store.set('messageNotificationTime', messageNotificationTime);
 })
 
 /*******************************/
 //Notification by clicking button
 /********************************/
 ipc.on('send-message', (event, data) =>{
+  mainWindow.minimize();  
+  setTimeout(function(){
     var title = (typeof data.title !== "undefined") ? data.title : "";
     var message = (typeof data.message !== "undefined") ? data.message : "";
     var detail = (typeof data.detail !== "undefined") ? data.detail : "";
     var type = (typeof data.type !== "undefined") ? data.type : 0;
     var callback = (typeof data.callback !== "undefined") ? data.callback : null;
     
-        var msg = { 
-            title : title, 
-            message : message, 
-            detail : detail,
-            timeout: displayMessageTime,
-            type: type,
-            callback: callback
-        }; 
-        
-        toasterObj.showToaster(mainWindow, msg); 
+    var msg = { 
+        title : title, 
+        message : message, 
+        detail : detail,
+        timeout: messageNotificationTime,
+        type: type,
+        callback: callback
+    }; 
+    
+    toasterObj.showToaster(msg);
+  },5000);
+  
 })
 
 //Initialise autoUpdate
@@ -304,14 +312,16 @@ ipc.on('toaster-reply', (event, data, callback_id) => {
   
   switch(callback_id){
     case 0:               
-      mainWindow.webContents.executeJavaScript('             \
-        $("#Notification-container").append(\''+ data.replace(/'/g, "\\'") + '\');');
+      mainWindow.webContents.executeJavaScript('\
+        console.log("The Toast is clicked.");');
       break;
     case 1:
-      console.log('The Toast Timed out', evt);      
+      mainWindow.webContents.executeJavaScript('\
+        console.log("The Toast Timed out.");');     
       break;
     case 2:
-      console.log('The Toast is dismissed', evt);
+      mainWindow.webContents.executeJavaScript('\
+        console.log("The Toast is dismissed.");');
       break;
   }
 });

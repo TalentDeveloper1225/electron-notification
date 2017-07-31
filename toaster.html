@@ -5,7 +5,7 @@
 <style>
 
   #main_box .focus-message{
-    width:65%;
+    width:82%;
   }
 
   #main_box .focus-message:nth-child(1){
@@ -13,11 +13,11 @@
   }
 
   #main_box .focus-message:nth-child(2){
-    width:80%;
+    width:90%;
   }
 
   #main_box .focus-message:nth-child(3){
-    width:70%;
+    width:85%;
   }
 
 </style>
@@ -32,13 +32,14 @@
       element.remove();      
       autoSetPosSize();
       if($("#main_box .focus-message").length == 0){        
-        window.close();
+        var ipc = require('electron').ipcRenderer;      
+        ipc.send('hideWindow');
       }
     }
 
-    function ShowDetailMessage(element){
+    function reply(data, callback_id){
       var ipc = require('electron').ipcRenderer;      
-      ipc.send('toaster-reply', $(element).parent().parent().parent().parent(), 0);
+      ipc.send('toaster-reply', data, callback_id);
     }
 
     function autoSetPosSize(){
@@ -51,14 +52,14 @@
         }
       
         window.resizeTo(result.width, result.height);
-        window.moveTo(screen.width-result.width, screen.height-result.height);     
+        window.moveTo(screen.width-result.width-20, screen.height-result.height);     
       }
     };
 </script>
 </head>
 <body style = "margin: 0px">
 <div  id="content" > <!--style = "height:calc(100vh - 30px);overflow: auto;">-->
-  <div id = "main_box" align = "center"><!-- style = " height: 100%;">-->
+  <div id = "main_box" align = "center" style = "padding:25px;"><!-- style = " height: 100%;">-->
     
   </div>
 </div>
