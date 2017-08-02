@@ -23,6 +23,8 @@
 </div>
 <h1>test page</h1>
 <button class = "message_button">Message</button>
+<button class = "allicons_button">All Icons</button>
+<button class = "unknowncaller_button">Unknown Caller</button>
 <button class = "update_button">update</button>
 <script type="text/javascript">
 	//******************* First hack for ScaleDrone Integration ////
@@ -30,20 +32,55 @@
 	var current_practice_id = "11CBDDE5-FF1D-467A-AE28-3784A8D45262";
 
 	if (typeof(require) !== 'undefined') {
+		
 		var ipc = require('electron').ipcRenderer;
 // 		if loaded ... 
   		$(document).ready(function() {
 			if (typeof ipc !== "undefined") {
 				var t = 0;
+				$('.unknowncaller_button').click(function(){
+					var message_data = {
+						title: "Unknown Caller",
+						message: "(555) 123-5678",
+						unscheduledtx: false,  //Green Icon
+						pastdue: false,   //Red Icon
+						newpatient: false,  // Blue Icon
+						birthday: false // yellow icon
+					};					
+					ipc.send("send-message", message_data);
+					t++;
+				});
+				
 				$('.message_button').click(function(){
 					var message_data = {
-						title: "Test Message"+ t.toString(),
-						message: "This is a test message."
+						title: "Robert Christopherson Family",
+						message: "(555) 444-2222",  //this is not displayed on the new design						
+						callback: t.toString(),
+						unscheduledtx: true,  //Green Icon
+						pastdue: true,   //Red Icon
+						newpatient: false,  // Blue Icon
+						birthday: false, // yellow icon						
 					};
 					
 					ipc.send("send-message", message_data);
 					t++;
-				});
+				});		
+
+				$('.allicons_button').click(function(){
+					var message_data = {
+						title: "Robert Christopherson Family",
+						message: "(555) 444-2222",  //this is not displayed on the new design						
+						callback: t.toString(),
+						unscheduledtx: true,  //Green Icon
+						pastdue: true,   //Red Icon
+						newpatient: true,  // Blue Icon
+						birthday: true, // yellow icon						
+					};
+					
+					ipc.send("send-message", message_data);
+					t++;
+				});				
+
 
 				$('.update_button').click(function(){
 					

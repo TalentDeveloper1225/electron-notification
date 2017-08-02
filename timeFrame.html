@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Set Message Display Time</title>
+<title>Message Notification Settings</title>
+<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
 <script>
     try {
@@ -12,29 +13,52 @@
     
 </script>
 </head>
-<body style="margin: 0px; height: 100vh;">
-<div align = "center" style = "display: flex; align-items:center;">
-<input type = "number" id = "display_time"></input>
-<button class = "okbtn">OK</button>
-</div>
+<body style="margin: 0px;">
+  <div class="panel panel-info" style="margin: 0px; height:100vh">
+    <div class="panel-heading">
+      <div class="panel-title" style="text-align: center; "><strong>Call Notification Time</strong></div>
+    </div>     
+    <div style="padding-top:20px" class="panel-body">
+      <div style="margin-bottom: 15px; width:50%" class="input-group" >
+        <input type="number" class="form-control" id = "message_notification_time">
+        <span class="input-group-addon">Seconds</sapn>
+      </div>
+      <div class=" controls">
+        <button type="button" name="save_buttons" class="btn btn-success btn-lg btn-block okbtn" style="    background-color: #0088c9 !important;
+          border-bottom: 4px solid #005984 !important;
+        border-color: #0088c9;
+          font-weight: bold !important;">Save</button>
+      </div>     
+    </div>
 
-<script type="text/javascript">
-  
-  if (typeof(require) !== 'undefined') {
-    var ipc = require('electron').ipcRenderer;
-//    if loaded ... 
-      $(document).ready(function() {
-      if (typeof ipc !== "undefined") {
-        
-        $('.okbtn').click(function(){
-          ipc.send("setDiplayMessageTime", $('#display_time').val());   
-          window.close();       
-        });
-      }
-    })
-  }
-  
-  //******************* ScaleDrone Integration ////
-</script>
+  </div>
+  <script type="text/javascript">
+    
+    if (typeof(require) !== 'undefined') {
+      var ipc = require('electron').ipcRenderer;
+  //    if loaded ... 
+        $(document).ready(function() {
+        if (typeof ipc !== "undefined") {
+          
+          $('.okbtn').click(function(){
+            ipc.send("setDiplayMessageTime", $('#message_notification_time').val());   
+            window.close();       
+          });
+		  
+			const Store = require('./store.js');
+			const store = new Store({
+			  // We'll call our data file 'user-preferences'
+			  configName: 'Setting_information',
+			  defaults: {
+				// 800x600 is the default size of our window
+				messageNotificationTime: 5000
+			  }
+			});		
+		  
+   		  $('#message_notification_time').val(store.get('messageNotificationTime')/1000);		  
+        }
+      })
+    }
+  </script>
 </body>
 </html>
