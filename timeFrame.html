@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>Message Notification Settings</title>
- <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
 <script>
     try {
@@ -16,7 +16,7 @@
 <body style="margin: 0px;">
   <div class="panel panel-info" style="margin: 0px; height:100vh">
     <div class="panel-heading">
-      <div class="panel-title" style="text-align: center; "><strong>Call Notification Timer</strong></div>
+      <div class="panel-title" style="text-align: center; "><strong>Call Notification Time</strong></div>
     </div>     
     <div style="padding-top:20px" class="panel-body">
       <div style="margin-bottom: 15px; width:50%" class="input-group" >
@@ -44,11 +44,21 @@
             ipc.send("setDiplayMessageTime", $('#message_notification_time').val());   
             window.close();       
           });
+		  
+			const Store = require('./store.js');
+			const store = new Store({
+			  // We'll call our data file 'user-preferences'
+			  configName: 'Setting_information',
+			  defaults: {
+				// 800x600 is the default size of our window
+				messageNotificationTime: 5000
+			  }
+			});		
+		  
+   		  $('#message_notification_time').val(store.get('messageNotificationTime')/1000);		  
         }
       })
     }
-    
-    //******************* ScaleDrone Integration ////
   </script>
 </body>
 </html>

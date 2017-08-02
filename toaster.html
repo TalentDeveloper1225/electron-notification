@@ -2,44 +2,29 @@
 <html>
 <head>
 <title>Call Notification</title>
-<style>
-
-  #main_box .focus-message{
-    width:82%;
-  }
-
-  #main_box .focus-message:nth-child(1){
-    width:100%;
-  }
-
-  #main_box .focus-message:nth-child(2){
-    width:90%;
-  }
-
-  #main_box .focus-message:nth-child(3){
-    width:85%;
-  }
-
-</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="assets/css/custom.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
 <script>
+	var ipc = require('electron').ipcRenderer;
+
     try {
         $ = jQuery = module.exports;
         // If you want module.exports to be empty, uncomment:
         // module.exports = {};
     } catch(e) {}
-    function removeMessage(element){
+    function removeMessage(element, callback){
       element.remove();      
       autoSetPosSize();
+	    if( callback == true ){
+		   var cb = element.getAttribute("callback");	
+		   ipc.send('toaster-reply', cb);
+	    }
+	  	  
       if($("#main_box .focus-message").length == 0){        
-        var ipc = require('electron').ipcRenderer;      
-        ipc.send('hideWindow');
+        window.close();
       }
-    }
-
-    function reply(data, callback_id){
-      var ipc = require('electron').ipcRenderer;      
-      ipc.send('toaster-reply', data, callback_id);
     }
 
     function autoSetPosSize(){
@@ -52,14 +37,14 @@
         }
       
         window.resizeTo(result.width, result.height);
-        window.moveTo(screen.width-result.width-20, screen.height-result.height);     
+        window.moveTo(screen.width-result.width, screen.height-result.height);     
       }
     };
 </script>
 </head>
 <body style = "margin: 0px">
-<div  id="content" > <!--style = "height:calc(100vh - 30px);overflow: auto;">-->
-  <div id = "main_box" align = "center" style = "padding:25px;"><!-- style = " height: 100%;">-->
+<div  id="content" > 
+  <div id = "main_box" align = "center" style ="background-color:#dee1e6; padding:5px">
     
   </div>
 </div>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Call Notification</title>
+<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+<script>
+    try {
+        $ = jQuery = module.exports;
+        // If you want module.exports to be empty, uncomment:
+        // module.exports = {};
+    } catch(e) {}
+    function removeMessage(element){      
+      element.remove();
+      if($("#main_box .focus-message").length == 0){
+        console.log("sdss");
+        window.close();
+      }
+    }
+</script>
+</head>
+<body >
+<div  id="content" style = "height:calc(100vh - 20px);overflow: auto;">
+  <div id = "main_box" style = "margin:10px; height: 100%;">
+    
+  </div>
+</div>
+
+</body>
+</html>
